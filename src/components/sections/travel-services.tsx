@@ -1,0 +1,3 @@
+import { ArrowUpRight, Ticket } from "lucide-react";
+import { travelServices } from "@/data/travel-content";
+export function TravelServices(){return <section id="services" className="service-strip"><div className="service-intro"><span className="eyebrow">ONE WORLD. EVERY WAY.</span><p>Go your own way.</p></div><div className="service-links">{travelServices.map(({id,label,icon:Icon})=><a href={`/${id === "packages" ? "holidays" : id}`} key={id}><Icon size={23} strokeWidth={1.3}/><span>{label === "Holiday packages" ? "Holidays" : label}</span><ArrowUpRight size={12}/></a>)}<a href="/experiences"><Ticket size={23} strokeWidth={1.3}/><span>Experiences</span><ArrowUpRight size={12}/></a></div></section>}
