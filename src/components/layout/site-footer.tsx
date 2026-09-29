@@ -22,15 +22,41 @@ export function SiteFooter() {
 
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-porcelain">Quick Navigation</h3>
-            <ul className="mt-4 space-y-2.5 text-sm">
+            <ul className="mt-4 space-y-2 text-sm">
               <li><a href="#top" className="transition hover:text-horizon">Home</a></li>
               <li><a href="#about" className="transition hover:text-horizon">About Us</a></li>
-              <li><a href="#destinations" className="transition hover:text-horizon">Destinations</a></li>
+              <li><a href="#destinations" className="transition hover:text-horizon">Holidays & Destinations</a></li>
               <li><a href="#services" className="transition hover:text-horizon">Our Services</a></li>
               <li><a href="#why-us" className="transition hover:text-horizon">Why Choose Us</a></li>
               <li><a href="#how-it-works" className="transition hover:text-horizon">How It Works</a></li>
               <li><a href="#enquiry" className="transition hover:text-horizon">Contact & Enquiry</a></li>
             </ul>
+
+            {/* Little Map in Quick Navigation */}
+            <div className="mt-5 overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] p-2.5 transition-all hover:border-horizon/40">
+              <div className="mb-2 flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 font-medium text-porcelain">
+                  <MapPin className="size-3.5 text-horizon" /> Dream Creations
+                </span>
+                <a
+                  href="https://www.google.com/maps/place/Dream+Creations/@26.7264651,88.4311389,17z/data=!3m1!5s0x39e4410f02d9df5f:0x4ed4d502d771cad2!4m14!1m7!3m6!1s0x39e441747567c84b:0x53c3c3763bcb076d!2sDream+Creations!8m2!3d26.7264603!4d88.4337138!16s%2Fg%2F11sc75rwh4!3m5!1s0x39e441747567c84b:0x53c3c3763bcb076d!8m2!3d26.7264603!4d88.4337138!16s%2Fg%2F11sc75rwh4?entry=ttu&g_ep=EgoyMDI2MDkyMy4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-[11px] text-horizon hover:underline"
+                >
+                  View Map <ArrowUpRight className="size-3" />
+                </a>
+              </div>
+              <div className="relative h-28 w-full overflow-hidden rounded-lg bg-black/40">
+                <iframe
+                  title="Dream Creations Location Map"
+                  src="https://maps.google.com/maps?q=26.7264603,88.4337138+(Dream+Creations)&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                  className="h-full w-full border-0 grayscale contrast-125 opacity-85 hover:opacity-100 hover:grayscale-0 transition-all duration-300"
+                  loading="lazy"
+                  allowFullScreen
+                />
+              </div>
+            </div>
           </div>
 
           <div>

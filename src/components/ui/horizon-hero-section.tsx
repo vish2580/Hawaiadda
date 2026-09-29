@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, Compass, MapPin, Pause, Play } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Compass, Pause, Play } from "lucide-react";
 import { lazy, Suspense, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -51,35 +51,13 @@ export function HorizonHeroSection() {
           <p className="hero-description hero-enter">
             Dream Hawai Adda is a travel agency and tour operator helping you plan and book domestic and international journeys — from flights and hotels to complete holidays and transportation.
           </p>
-          <div className="hero-actions hero-enter">
+
+          <div className="hero-actions hero-enter mt-8">
             <a href="#enquiry" className="primary-link font-semibold shadow-lg shadow-horizon/25">
               Talk to Our Travel Expert <ArrowUpRight size={18} />
             </a>
-            <a href="#about" className="secondary-link">
-              Explore More <ArrowUpRight size={16} />
-            </a>
-          </div>
-          <div className="mt-5 flex flex-wrap items-center gap-2 text-xs font-semibold tracking-wider text-porcelain/90 hero-enter">
-            <span className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">Flights</span>
-            <span className="text-horizon">•</span>
-            <span className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">Hotels</span>
-            <span className="text-horizon">•</span>
-            <span className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">Tours</span>
-            <span className="text-horizon">•</span>
-            <span className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">Holidays</span>
-            <span className="text-horizon">•</span>
-            <span className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 backdrop-blur-md">Transportation</span>
           </div>
         </div>
-        <a className="hero-place" href="#destinations">
-          <span className="place-icon"><MapPin size={19} /></span>
-          <span>
-            <small>POPULAR DESTINATIONS</small>
-            <strong>Sikkim & Darjeeling</strong>
-            <span>Himalayas to exotic escapes.</span>
-          </span>
-          <ArrowUpRight size={20} />
-        </a>
         <div className="hero-bottom">
           <a href="#about"><ArrowDown size={15} /> SCROLL TO DISCOVER</a>
           <span><Compass size={15} /> TRAVEL. PLANNED YOUR WAY.</span>
