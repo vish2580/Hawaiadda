@@ -30,7 +30,7 @@ export function FinalCtaSection() {
           </Button>
 
           <Button asChild variant="outline" size="lg" className="w-full sm:w-auto border-white/20 hover:border-emerald-400 hover:text-emerald-400 px-7 py-6 text-base">
-            <a href="https://wa.me/919800000000?text=Hi%20Dream%20Hawai%20Adda,%20I%20want%20to%20plan%20my%20next%20journey!" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/919933840222?text=Hi%20Dream%20Hawai%20Adda,%20I%20want%20to%20plan%20my%20next%20journey!" target="_blank" rel="noopener noreferrer">
               <MessageCircle className="mr-2 size-5 text-emerald-400" /> WhatsApp Us
             </a>
           </Button>

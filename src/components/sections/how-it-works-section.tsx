@@ -55,7 +55,7 @@ export function HowItWorksSection() {
 
         <div className="mt-14 text-center">
           <Button asChild size="lg" className="bg-horizon hover:bg-horizon/90 text-obsidian font-bold px-8 shadow-xl shadow-horizon/20">
-            <a href="#enquiry">
+            <a href="/book-your-trip">
               <PhoneCall className="mr-2 size-4" /> Talk to Our Travel Expert <ArrowUpRight className="ml-1.5 size-4" />
             </a>
           </Button>

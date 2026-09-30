@@ -15,6 +15,9 @@ import { JourneyProgress } from "@/components/travel/journey-progress";
 import { AiAssistant } from "@/components/travel/ai-assistant";
 import { RoutePage } from "@/components/pages/route-page";
 
+import { CompanyPage } from "@/components/pages/company-page";
+import { navLinks } from "@/data/navigation";
+
 export default function App() {
   return (
     <>
@@ -32,7 +35,7 @@ export default function App() {
 
       <main id="main">
         {window.location.pathname !== "/" ? (
-          <RoutePage />
+          navLinks.some(link => link.href === window.location.pathname) ? <CompanyPage path={window.location.pathname} /> : <RoutePage />
         ) : (
           <>
             {/* HERO (Includes Top Booking Console) */}

@@ -43,7 +43,7 @@ export function AboutSection() {
 
             <div className="pt-2">
               <Button asChild size="lg" className="bg-horizon hover:bg-horizon/90 text-obsidian font-semibold px-8 shadow-lg shadow-horizon/20">
-                <a href="#enquiry">
+                <a href="/book-your-trip">
                   Plan My Trip <ArrowUpRight className="ml-2 size-4" />
                 </a>
               </Button>

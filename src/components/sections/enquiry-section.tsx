@@ -252,7 +252,7 @@ export function EnquirySection() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
                 <Button asChild size="lg" className="bg-emerald-500 hover:bg-emerald-400 text-obsidian font-bold px-8 shadow-xl shadow-emerald-500/20">
-                  <a href={`https://wa.me/919800000000?text=${whatsappMessage}`} target="_blank" rel="noopener noreferrer">
+                  <a href={`https://wa.me/919933840222?text=${whatsappMessage}`} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="mr-2 size-5" /> Chat on WhatsApp with Expert
                   </a>
                 </Button>

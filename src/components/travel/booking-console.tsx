@@ -13,7 +13,7 @@ const today = () => {
 };
 
 const schema = z.object({
-  service: z.string(),
+  service: z.enum(['flights','hotels','trains','buses','cabs','packages','flights-trains','hotels-resorts','tours','transportation','honeymoon','group-corporate','family-corporate']),
   tripMode: z.enum(['round-trip', 'one-way', 'multi-city']),
   from: z.string().trim(),
   to: z.string().trim().min(2, 'Choose a destination'),
@@ -50,7 +50,7 @@ export function BookingConsole({ initialService = 'flights' }: { initialService?
   const [ideas, setIdeas] = useState(false);
   const [message, setMessage] = useState('');
   const { register, watch, setValue, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<Values>({
-    resolver: zodResolver(schema) as any,
+    resolver: zodResolver(schema),
     defaultValues: {
       service: initialService,
       tripMode: 'round-trip',
@@ -75,7 +75,7 @@ export function BookingConsole({ initialService = 'flights' }: { initialService?
     setIdeas(false);
     setMessage('');
     try {
-      const result = await travelApi.submitSearch(v as any);
+      const result = await travelApi.submitSearch(v);
       setMessage(result.message);
     } catch {
       setMessage('We couldn’t prepare your search. Please try again.');
