@@ -1,4 +1,4 @@
-import { Compass, MessageCircle, Menu, X, ArrowUpRight } from "lucide-react";
+import { MessageCircle, Menu, X, ArrowUpRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -44,9 +44,8 @@ export function SiteHeader() {
   return (
     <header className={cn("site-navigation fixed inset-x-0 top-0 z-50 border-b transition-all duration-300", scrolled || open ? "border-white/10 bg-obsidian/92 backdrop-blur-xl" : "border-transparent bg-transparent")}>
       <div className="navigation-top mx-auto flex h-[4.75rem] max-w-frame items-center justify-between px-gutter">
-        <a href="/" className="font-display text-lg font-semibold tracking-[0.12em] text-porcelain focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ion flex items-center">
-          <Compass className="mr-2 size-6 text-horizon animate-pulse" aria-hidden="true" />
-          <span>HAWAIADDA</span>
+        <a href="/" aria-label="Dream Hawai Adda home" className="shrink-0 flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ion">
+          <img src="/images/dream-hawai-adda-logo.png" alt="Dream Hawai Adda — Ek Safar Humare Saath" width="1656" height="950" className="h-[60px] w-auto object-contain min-[1024px]:h-[52px] min-[1440px]:h-[68px]" />
         </a>
 
         {/* Desktop Navigation */}
