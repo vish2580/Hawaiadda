@@ -1,4 +1,4 @@
-import { ArrowUpRight, Compass, Instagram, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { ArrowUpRight, Instagram, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -6,9 +6,14 @@ export function SiteFooter() {
       <div className="mx-auto max-w-frame px-gutter">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr] pb-14 border-b border-white/10">
           <div>
-            <a href="/" className="flex items-center gap-3 text-2xl font-bold tracking-wider text-porcelain">
-              <Compass className="size-7 text-horizon animate-pulse" />
-              <span>DREAM HAWAI ADDA</span>
+            <a href="/" aria-label="Dream Hawai Adda home" className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ion">
+              <img
+                src="/images/dream-hawai-adda-logo.png"
+                alt="Dream Hawai Adda — Ek Safar Humare Saath"
+                width="1656"
+                height="950"
+                className="h-16 w-auto object-contain"
+              />
             </a>
             <p className="mt-3 text-base font-medium text-horizon">Travel. Planned Your Way.</p>
             <p className="mt-4 max-w-md text-sm leading-relaxed text-smoke/90">
@@ -25,11 +30,11 @@ export function SiteFooter() {
             <ul className="mt-4 space-y-2 text-sm">
               <li><a href="/" className="transition hover:text-horizon">Home</a></li>
               <li><a href="/about" className="transition hover:text-horizon">About Us</a></li>
-              <li><a href="/destinations" className="transition hover:text-horizon">Holidays & Destinations</a></li>
-              <li><a href="/services" className="transition hover:text-horizon">Our Services</a></li>
-              <li><a href="/why-choose-us" className="transition hover:text-horizon">Why Choose Us</a></li>
-              <li><a href="/how-we-work" className="transition hover:text-horizon">How It Works</a></li>
-              <li><a href="/book-your-trip" className="transition hover:text-horizon">Contact & Enquiry</a></li>
+              <li><a href="/services" className="transition hover:text-horizon">Services</a></li>
+              <li><a href="/destinations" className="transition hover:text-horizon">Destinations</a></li>
+              <li><a href="/how-we-work" className="transition hover:text-horizon">How We Work</a></li>
+              <li><a href="/book-your-trip" className="transition hover:text-horizon">Plan Your Trip</a></li>
+              <li><a href="/contact" className="transition hover:text-horizon">Contact Us</a></li>
             </ul>
 
             {/* Little Map in Quick Navigation */}

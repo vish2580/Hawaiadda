@@ -1,9 +1,9 @@
 export const navLinks = [
-  { label: 'Destinations', href: '/destinations' },
-  { label: 'Services', href: '/services' },
   { label: 'About Us', href: '/about' },
-  { label: 'Contact Us', href: '/contact' },
+  { label: 'Services', href: '/services' },
+  { label: 'Destinations', href: '/destinations' },
   { label: 'How We Work', href: '/how-we-work' },
-  { label: 'Why Choose Us', href: '/why-choose-us' },
-  { label: 'Book Your Trip', href: '/book-your-trip' },
+  { label: 'Plan Your Trip', href: '/book-your-trip' },
+  { label: 'Contact Us', href: '/contact' },
 ] as const;
+

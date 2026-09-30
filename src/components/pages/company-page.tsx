@@ -35,6 +35,6 @@ export function CompanyPage({ path }: { path: string }) {
     {path === '/about' && <AboutSection/>}
     {path === '/services' && <ServicesSection/>}
     {path === '/destinations' && <DestinationsSection/>}
-    {path === '/book-your-trip' && <EnquirySection/>}
+    {(path === '/book-your-trip' || path === '/plan-your-trip') && <EnquirySection/>}
   </div>;
 }
