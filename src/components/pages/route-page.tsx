@@ -21,7 +21,7 @@ const information:Record<string,[string,string]>={
  cancellation:['Change of plans?','There are no active reservations in this preview. Cancellation rules will be displayed with live supplier offers before booking.'],
  refunds:['A clear way back.','No payments are collected in this preview. Refund terms will be published when booking becomes available.'],
  terms:['Terms of use','This experience is a frontend preview. Sample prices and travel ideas are illustrative, not offers to book. Full service terms will be published before launch.'],
- privacy:['Your privacy','Searches and chat messages are processed locally in this preview. No booking or email subscription is submitted. Travel photographs and fonts are loaded from external providers.'],
+ privacy:['Your privacy','Trip enquiries are sent to our travel team and stored in Google Sheets when you submit the form. The WhatsApp option opens your enquiry details in WhatsApp, where you choose whether to send them. Search and assistant previews remain local. Travel photographs and fonts are loaded from external providers.'],
 };
 export function RoutePage(){
  const slug=decodeURIComponent(window.location.pathname.slice(1));

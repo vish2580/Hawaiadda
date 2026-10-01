@@ -29,6 +29,10 @@ Open http://127.0.0.1:5173. Validate with `npm run build` and `npm run lint`.
 - `src/data`: typed destination, image and editorial inventories.
 - `src/services/travel-api.ts`: provider integration boundary.
 
+## Website enquiry setup
+
+The enquiry form posts to `public/api/enquiry.php`, which verifies a Google Apps Script save before displaying success. Configure and deploy it using [the Google Sheets setup guide](integrations/google-sheets/SETUP.md). The target spreadsheet is preselected in `integrations/google-sheets/Code.gs`. PHP with cURL and a private server configuration are required. WhatsApp opens a prefilled message for the visitor to send. The connection requires deployment and has not been verified live.
+
 ## Integration status
 
 This is a frontend experience, not a live booking system. All prices are indicative. Search validates input and returns a preview acknowledgement, never invented inventory. Authentication, payments, supplier inventory, support operations and newsletter subscriptions are not connected. The assistant explicitly indicates that no AI service is connected. Company/support/social pages communicate their availability without invented contacts or partner claims.

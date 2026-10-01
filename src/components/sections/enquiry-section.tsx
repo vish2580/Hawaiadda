@@ -1,10 +1,6 @@
-import { Calendar, CheckCircle2, ChevronDown, Info, Loader2, Mail, MapPin, MessageCircle, Phone, Plane, Send, Settings2, Ticket, User, Users } from "lucide-react";
-import { useState } from "react";
+import { Calendar, CheckCircle2, ChevronDown, Loader2, Mail, MapPin, MessageCircle, Phone, Plane, Send, Ticket, User, Users } from "lucide-react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-
-// Default Google Apps Script Web App Endpoint for Google Sheets integration
-// Users can also enter their own Google Web App Script URL in the UI setting
-const DEFAULT_GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbz_SAMPLE_DREAM_HAWAI_ADDA_SHEET/exec";
 
 interface DestinationAirport {
   code: string;
@@ -37,65 +33,47 @@ export function EnquirySection() {
     notes: "",
   });
 
-  const [customSheetUrl, setCustomSheetUrl] = useState<string>(() => {
-    return localStorage.getItem("dha_google_sheet_url") || "";
-  });
-  const [showSheetSettings, setShowSheetSettings] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [sheetStatus, setSheetStatus] = useState<string>("");
+  const [submitError, setSubmitError] = useState("");
+  const [website, setWebsite] = useState("");
+  const request = useRef<{ data: string; id: string } | null>(null);
+  const submitting = useRef(false);
+  const successHeading = useRef<HTMLHeadingElement>(null);
 
   const activeDest = destinationAirports[formData.destination] || destinationAirports["Sikkim"];
 
-  const handleSaveSheetUrl = (url: string) => {
-    setCustomSheetUrl(url);
-    localStorage.setItem("dha_google_sheet_url", url);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setIsSubmitting(true);
-    setSheetStatus("");
-
-    const payload = {
-      timestamp: new Date().toISOString(),
-      name: formData.name,
-      phone: formData.phone,
-      email: formData.email,
-      destination: formData.destination,
-      airportCode: activeDest.code,
-      travelDate: formData.travelDate,
-      travellers: formData.travellers,
-      notes: formData.notes,
-      source: "Dream Hawai Adda Boarding Pass",
-    };
-
-    // Save lead to local storage as safety backup
-    try {
-      const existingLeads = JSON.parse(localStorage.getItem("dha_enquiry_leads") || "[]");
-      existingLeads.unshift(payload);
-      localStorage.setItem("dha_enquiry_leads", JSON.stringify(existingLeads));
-    } catch {
-      // ignore
+    setSubmitError("");
+    const data = JSON.stringify(formData);
+    // Reuse the ID on retry so a delayed response cannot create a second row.
+    if (request.current?.data !== data) {
+      request.current = { data, id: crypto.randomUUID() };
     }
-
-    const endpoint = customSheetUrl.trim() || DEFAULT_GOOGLE_SHEET_URL;
-
-    // Send to Google Sheets webhook
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 30000);
     try {
-      await fetch(endpoint, {
+      const response = await fetch("/api/enquiry.php", {
         method: "POST",
-        mode: "no-cors", // Standard mode for Google Apps Script Web App endpoints
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...formData, requestId: request.current.id, website }),
+        signal: controller.signal,
       });
-      setSheetStatus("Connected & Recorded to Google Sheet");
+      const result = await response.json();
+      if (!response.ok || result.ok !== true) throw new Error("Unconfirmed submission");
+      setSubmitted(true);
+      requestAnimationFrame(() => successHeading.current?.focus());
     } catch {
-      setSheetStatus("Saved to local database");
+      setSubmitError("We couldn’t confirm your enquiry was saved. Please retry, or send your details using WhatsApp below.");
+    } finally {
+      clearTimeout(timeout);
+      submitting.current = false;
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setSubmitted(true);
   };
 
   const whatsappMessage = encodeURIComponent(
@@ -117,69 +95,11 @@ export function EnquirySection() {
               <span className="text-horizon">Get Your Boarding Pass</span>
             </h2>
             <p className="text-smoke text-sm sm:text-base leading-relaxed">
-              Tell us where you want to go and we’ll get in touch to understand your requirements. Every enquiry is automatically logged to Google Sheets and routed to a dedicated travel expert.
+              Tell us where you want to go and our travel team will help you plan. Submit your enquiry, then continue the conversation on WhatsApp.
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setShowSheetSettings(!showSheetSettings)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/[0.04] px-3 py-2 text-xs font-medium text-smoke hover:border-horizon hover:text-porcelain transition-colors"
-            >
-              <Settings2 className="size-3.5 text-horizon" />
-              <span>Google Sheet Config</span>
-            </button>
-          </div>
         </div>
-
-        {/* Google Sheet Webhook Configuration Drawer */}
-        {showSheetSettings && (
-          <div className="mb-8 rounded-2xl border border-horizon/30 bg-[#0d1219] p-5 text-xs text-smoke shadow-2xl transition-all">
-            <div className="flex items-center justify-between pb-3 border-b border-white/10">
-              <div className="flex items-center gap-2 font-semibold text-porcelain text-sm">
-                <Settings2 className="size-4 text-horizon" />
-                <span>Google Sheet Integration Settings</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowSheetSettings(false)}
-                className="text-smoke hover:text-white"
-              >
-                ✕ Close
-              </button>
-            </div>
-            <div className="grid md:grid-cols-2 gap-4 pt-3">
-              <div>
-                <label className="block font-medium text-porcelain mb-1">
-                  Google Apps Script Web App URL:
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://script.google.com/macros/s/.../exec"
-                  value={customSheetUrl}
-                  onChange={(e) => handleSaveSheetUrl(e.target.value)}
-                  className="w-full rounded-lg border border-white/20 bg-white/[0.05] p-2 text-porcelain placeholder:text-smoke/40 text-xs focus:border-horizon focus:outline-none"
-                />
-                <p className="mt-1 text-[11px] text-smoke/70">
-                  Submissions are posted via HTTP POST payload. Leave blank to use the default configured Google Sheet.
-                </p>
-              </div>
-
-              <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3">
-                <p className="font-semibold text-porcelain mb-1 flex items-center gap-1">
-                  <Info className="size-3.5 text-horizon" /> How to connect your own Google Sheet:
-                </p>
-                <ol className="list-decimal list-inside space-y-1 text-[11px] text-smoke/90">
-                  <li>Create a new Google Sheet (Columns: <em>Timestamp, Name, Phone, Email, Destination, Date, Travellers, Notes</em>).</li>
-                  <li>In Google Sheets, go to <strong>Extensions → Apps Script</strong>.</li>
-                  <li>Paste a standard `doPost(e)` script and deploy as <strong>Web App (Anyone)</strong>.</li>
-                  <li>Paste your Web App URL here!</li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* BOARDING PASS TICKET CONTAINER */}
         <div className="relative mx-auto max-w-5xl rounded-3xl border border-white/20 bg-gradient-to-br from-[#11161f] via-[#0d1117] to-[#0a0d12] shadow-[0_20px_70px_rgba(0,0,0,0.6)] overflow-hidden">
@@ -215,19 +135,15 @@ export function EnquirySection() {
 
               <div className="space-y-2">
                 <span className="inline-block rounded-full bg-horizon/15 border border-horizon/30 px-3.5 py-1 text-xs font-mono font-bold tracking-wider text-horizon uppercase">
-                  BOARDING PASS CONFIRMED & LOGGED
+                  ENQUIRY RECEIVED
                 </span>
-                <h3 className="font-display text-3xl sm:text-4xl font-bold text-porcelain">
+                <h3 ref={successHeading} tabIndex={-1} className="font-display text-3xl sm:text-4xl font-bold text-porcelain">
                   Welcome Aboard, {formData.name || "Traveller"}!
                 </h3>
                 <p className="text-sm sm:text-base text-smoke max-w-lg mx-auto leading-relaxed">
                   Your trip enquiry for <strong className="text-horizon">{formData.destination}</strong> ({activeDest.code}) on <strong>{formData.travelDate || "your chosen date"}</strong> has been submitted.
                 </p>
-                {sheetStatus && (
-                  <p className="text-xs text-emerald-400 font-mono flex items-center justify-center gap-1.5 pt-1">
-                    <CheckCircle2 className="size-3.5" /> {sheetStatus}
-                  </p>
-                )}
+                <p className="text-sm text-smoke">Your details have been saved for our team. Tap below, then press Send in WhatsApp to share your enquiry there too.</p>
               </div>
 
               {/* Boarding Pass Receipt Summary */}
@@ -259,16 +175,21 @@ export function EnquirySection() {
 
                 <Button
                   variant="outline"
-                  onClick={() => setSubmitted(false)}
+                  onClick={() => { setSubmitted(false); setSubmitError(""); }}
                   className="border-white/20 text-xs"
                 >
-                  Edit / Submit Another Pass
+                  Back to enquiry
                 </Button>
               </div>
             </div>
           ) : (
             /* Active Interactive Boarding Pass Form */
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} aria-busy={isSubmitting}>
+              <div className="hidden" aria-hidden="true">
+                <label htmlFor="enquiry-website">Leave this field empty</label>
+                <input id="enquiry-website" tabIndex={-1} autoComplete="off" value={website} onChange={e => setWebsite(e.target.value)} />
+              </div>
+              <fieldset disabled={isSubmitting} className="min-w-0">
               <div className="grid lg:grid-cols-12 relative">
                 {/* Left/Main Ticket Area (Cols 1 to 8) */}
                 <div className="lg:col-span-8 p-6 sm:p-8 space-y-6">
@@ -307,7 +228,7 @@ export function EnquirySection() {
                     {/* Row 1: Name & Phone */}
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
+                        <label htmlFor="enquiry-name" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
                           01 // PASSENGER NAME *
                         </label>
                         <div className="relative">
@@ -316,6 +237,7 @@ export function EnquirySection() {
                             type="text"
                             required
                             placeholder="e.g. Aditi Sen"
+                            id="enquiry-name" maxLength={120}
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             className="w-full rounded-xl border border-white/15 bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-porcelain placeholder:text-smoke/40 focus:border-horizon focus:outline-none focus:ring-1 focus:ring-horizon"
@@ -324,7 +246,7 @@ export function EnquirySection() {
                       </div>
 
                       <div>
-                        <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
+                        <label htmlFor="enquiry-phone" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
                           02 // PHONE / WHATSAPP *
                         </label>
                         <div className="relative">
@@ -333,6 +255,7 @@ export function EnquirySection() {
                             type="tel"
                             required
                             placeholder="e.g. +91 98765 43210"
+                            id="enquiry-phone" maxLength={30}
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             className="w-full rounded-xl border border-white/15 bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-porcelain placeholder:text-smoke/40 focus:border-horizon focus:outline-none focus:ring-1 focus:ring-horizon"
@@ -344,7 +267,7 @@ export function EnquirySection() {
                     {/* Row 2: Email & Destination */}
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
+                        <label htmlFor="enquiry-email" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
                           03 // PASSENGER EMAIL *
                         </label>
                         <div className="relative">
@@ -353,6 +276,7 @@ export function EnquirySection() {
                             type="email"
                             required
                             placeholder="e.g. aditi@example.com"
+                            id="enquiry-email" maxLength={254}
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             className="w-full rounded-xl border border-white/15 bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-porcelain placeholder:text-smoke/40 focus:border-horizon focus:outline-none focus:ring-1 focus:ring-horizon"
@@ -361,12 +285,13 @@ export function EnquirySection() {
                       </div>
 
                       <div>
-                        <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
+                        <label htmlFor="enquiry-destination" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
                           04 // CHOOSE DESTINATION *
                         </label>
                         <div className="relative">
                           <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-smoke pointer-events-none" />
                           <select
+                            id="enquiry-destination"
                             value={formData.destination}
                             onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
                             className="w-full rounded-xl border border-white/15 bg-[#141820] py-2.5 pl-10 pr-8 text-sm text-porcelain focus:border-horizon focus:outline-none focus:ring-1 focus:ring-horizon appearance-none"
@@ -385,7 +310,7 @@ export function EnquirySection() {
                     {/* Row 3: Travel Date & Travellers */}
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
+                        <label htmlFor="enquiry-travelDate" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
                           05 // DEPARTURE DATE *
                         </label>
                         <div className="relative">
@@ -393,6 +318,7 @@ export function EnquirySection() {
                           <input
                             type="date"
                             required
+                            id="enquiry-travelDate"
                             value={formData.travelDate}
                             onChange={(e) => setFormData({ ...formData, travelDate: e.target.value })}
                             className="w-full rounded-xl border border-white/15 bg-white/[0.04] py-2.5 pl-10 pr-4 text-sm text-porcelain focus:border-horizon focus:outline-none focus:ring-1 focus:ring-horizon"
@@ -401,12 +327,13 @@ export function EnquirySection() {
                       </div>
 
                       <div>
-                        <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
+                        <label htmlFor="enquiry-travellers" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
                           06 // NUMBER OF TRAVELLERS *
                         </label>
                         <div className="relative">
                           <Users className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-smoke pointer-events-none" />
                           <select
+                            id="enquiry-travellers"
                             value={formData.travellers}
                             onChange={(e) => setFormData({ ...formData, travellers: e.target.value })}
                             className="w-full rounded-xl border border-white/15 bg-[#141820] py-2.5 pl-10 pr-8 text-sm text-porcelain focus:border-horizon focus:outline-none focus:ring-1 focus:ring-horizon appearance-none"
@@ -424,13 +351,14 @@ export function EnquirySection() {
 
                     {/* Row 4: Preferences / Notes */}
                     <div>
-                      <label className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
+                      <label htmlFor="enquiry-notes" className="block font-mono text-[11px] font-bold uppercase tracking-wider text-smoke mb-1.5">
                         07 // SPECIAL CABIN REQUESTS & PREFERENCES
                       </label>
                       <textarea
                         rows={2}
                         placeholder="Hotel preference, cab transfer, honeymoon setup, meal requests, or budget guide..."
-                        value={formData.notes}
+                        id="enquiry-notes" maxLength={2000}
+                            value={formData.notes}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                         className="w-full rounded-xl border border-white/15 bg-white/[0.04] p-3 text-sm text-porcelain placeholder:text-smoke/40 focus:border-horizon focus:outline-none focus:ring-1 focus:ring-horizon"
                       />
@@ -452,7 +380,7 @@ export function EnquirySection() {
                       </div>
                       <span className="text-[10px] hidden sm:inline">ETKT // 882-90128490</span>
                     </div>
-                    <span className="text-[11px] text-horizon">CONNECTS TO GOOGLE SHEET & WHATSAPP</span>
+                    <span className="text-[11px] text-horizon">PERSONALISED TRIP PLANNING</span>
                   </div>
                 </div>
 
@@ -516,6 +444,12 @@ export function EnquirySection() {
                   </div>
 
                   <div className="space-y-3 pt-4">
+                    {submitError && (
+                      <div role="alert" className="rounded-xl border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-100">
+                        <p>{submitError}</p>
+                        <a className="mt-3 inline-flex min-h-11 items-center underline" href={`https://wa.me/919933840222?text=${whatsappMessage}`} target="_blank" rel="noopener noreferrer">Send details on WhatsApp</a>
+                      </div>
+                    )}
                     <Button
                       type="submit"
                       disabled={isSubmitting}
@@ -524,7 +458,7 @@ export function EnquirySection() {
                     >
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="size-4 animate-spin" /> Issuing Pass…
+                          <Loader2 className="size-4 animate-spin" /> Sending enquiry…
                         </>
                       ) : (
                         <>
@@ -534,11 +468,12 @@ export function EnquirySection() {
                     </Button>
 
                     <p className="text-[10px] text-center text-smoke/80 font-mono">
-                      ✓ Instant Google Sheets sync & WhatsApp callback
+                      We’ll use your details to respond to your trip enquiry.
                     </p>
                   </div>
                 </div>
               </div>
+              </fieldset>
             </form>
           )}
         </div>
